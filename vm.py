@@ -154,6 +154,7 @@ class VM:
         os.remove(tmp_file)
         return mem
 
-    def nr_free_pages(self):
-        return int.from_bytes(self.read_pmem(0x00952b00, 4), byteorder='little')
+    def mem_usage(self):
+        nr_free = int.from_bytes(self.read_pmem(0x00952b00, 4), byteorder='little')
+        return 80 * 1024 * 1024 - nr_free * 4096
         
