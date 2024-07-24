@@ -116,6 +116,7 @@ class VM:
                         try:
                             json_data = json.loads(buffer[last_offset:offset])
                             last_offset = offset
+                            #print(json_data)
                             output.append(json_data)
 
                         except json.JSONDecodeError as e:
@@ -141,14 +142,18 @@ class VM:
         time.sleep(1)
         return self.read_qmp()
 
-    def read_pmem(self, start, end):
+    def read_pmem(self, start, size):
         while True:
             tmp_file = "/tmp/pmemsave-" + str(random.randint(0,9999))
             if not os.path.exists(tmp_file):
                 break
 
-        self.run_command("pmemsave", arguments={"val": start, "size": end - start, "filename": tmp_file})
+        self.run_command("pmemsave", arguments={"val": start, "size": size, "filename": tmp_file})
 
         mem = open(tmp_file, "rb").read()
         os.remove(tmp_file)
         return mem
+
+    def nr_free_pages(self):
+        return int.from_bytes(self.read_pmem(0x00952b00, 4), byteorder='little')
+        
